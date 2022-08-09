@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import okhttp3.*
 
 const val STREAM_URL = "wss://stream.binance.com:9443/ws/btcusdt@ticker"
-private const val TAG = "Repository"
 
 class Repository {
 
@@ -22,18 +21,8 @@ class Repository {
 
         val listener = object : WebSocketListener() {
             override fun onMessage(webSocket: WebSocket, text: String) {
-                Log.d(TAG, "onMessage: $text")
                 val tradeMessage = Gson().fromJson<TickerMessage>(text, TickerMessage::class.java)
                 trySend(tradeMessage.price.toDouble())
-            }
-
-            override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                Log.d(TAG, "onClosed: $reason")
-            }
-
-            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                Log.d(TAG, "onFailure: ${response?.message}")
-                throw t
             }
         }
         webSocket = client.newWebSocket(request, listener)
